@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 17</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #background {
+            background-color: #1e90ff;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            z-index: -1;
+        }
+        #taskbar {
+            background: rgba(0, 0, 0, 0.5);
+            height: 40px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+        #start-icon {
+            height: 30px;
+            cursor: pointer;
+        }
+        #copilot-icon {
+            height: 30px;
+            cursor: pointer;
+        }
+        #start-menu {
+            display: none;
+            position: absolute;
+            bottom: 40px;
+            left: 10px;
+            width: 300px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        #start-menu .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #start-menu .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        #start-menu .user-info div {
+            flex-grow: 1;
+        }
+        #start-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #start-menu li {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        #start-menu li:hover {
+            background: #f0f0f0;
+        }
+        #start-menu li img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        #shutdown-button {
+            margin-top: 10px;
+            text-align: right;
+        }
+        .window {
+            width: 400px;
+            height: 300px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: absolute;
+            display: none;
+            border-radius: 10px;
+        }
+        .window-header {
+            background: #0078d7;
+            color: white;
+            padding: 10px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .window-body {
+            padding: 10px;
+            height: calc(100% - 40px);
+            overflow: auto;
+        }
+        .window-buttons {
+            display: flex;
+        }
+        .window-buttons span {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        #bluescreen {
+            display: none;
+            background: #0000ff;
+            color: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            padding-top: 200px;
+            font-size: 24px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const startMenu = document.getElementById('start-menu');
+            const startIcon = document.getElementById('start-icon');
+            const userNameDisplay = document.getElementById('user-name');
+            const userIcon = document.getElementById('user-icon');
+
+            function toggleStartMenu() {
+                startMenu.style.display = startMenu.style.display === 'none' ? 'block' : 'none';
+            }
+
+            function openApp(appId) {
+                const app = document.getElementById(appId);
+                app.style.display = 'block';
+            }
+
+            function closeWindow(appId) {
+                const app = document.getElementById(appId);
+                app.style.display = 'none';
+            }
+
+            function minimizeWindow(appId) {
+                const app = document.getElementById(appId);
+                app.style.display = 'none';
+            }
+
+            function maximizeWindow(appId) {
+                const app = document.getElementById(appId);
+                app.style.width = app.style.width === '100%' ? '400px' : '100%';
+                app.style.height = app.style.height === '100%' ? '300px' : '100%';
+                app.style.top = app.style.top === '0' ? '' : '0';
+                app.style.left = app.style.left === '0' ? '' : '0';
+            }
+
+            function shutdown() {
+                alert('シャットダウンしています...');
+                // シャットダウン処理をここに追加
+            }
+
+            function saveUserSettings() {
+                const userName = prompt('新しいユーザー名を入力してください:', userNameDisplay.textContent);
+                if (userName) {
+                    userNameDisplay.textContent = userName;
+                    localStorage.setItem('userName', userName);
+                }
+                const userIconUrl = prompt('新しいアイコンのURLを入力してください:', userIcon.src);
+                if (userIconUrl) {
+                    userIcon.src = userIconUrl;
+                    localStorage.setItem('userIcon', userIconUrl);
+                }
+            }
+
+            function loadUserSettings() {
+                const savedUserName = localStorage.getItem('userName');
+                if (savedUserName) {
+                    userNameDisplay.textContent = savedUserName;
+                }
+                const savedUserIcon = localStorage.getItem('userIcon');
+                if (savedUserIcon) {
+                    userIcon.src = savedUserIcon;
+                }
+            }
+
+            startIcon.addEventListener('click', toggleStartMenu);
+            document.getElementById('user-info').addEventListener('click', saveUserSettings);
+
+            loadUserSettings();
+        });
+    </script>
+</head>
+<body>
+    <div id="background"></div>
+    <div id="taskbar">
+        <img src="icon1.png" alt="Start Icon" id="start-icon">
+        <img src="copilot.png" alt="Copilot Icon" id="copilot-icon">
+    </div>
+    <div id="start-menu">
+        <div class="user-info" id="user-info">
+            <img src="user.png" alt="User Icon" id="user-icon">
+            <div>
+                <strong id="user-name">ユーザー名</strong><br>
+                <a href="#">コントロールパネル</a>
+            </div>
+        </div>
+        <ul>
+            <li onclick="openApp('word')"><img src="word.png" alt="Word"> Word</li>
+            <li onclick="openApp('excel')"><img src="excel.png" alt="Excel"> Excel</li>
+            <li onclick="openApp('powerpoint')"><img src="powerpoint.png" alt="PowerPoint"> PowerPoint</li>
+            <li onclick="openApp('app4')"><img src="browser.png" alt="ブラウザ"> ブラウザ</li>
+            <li onclick="openApp('app5')"><img src="notepad.png" alt="メモ帳"> メモ帳</li>
+            <li onclick="openApp('app6')"><img src="calculator.png" alt="電卓"> 電卓</li>
+            <li onclick="openApp('app7')"><img src="calendar.png" alt="カレンダー"> カレンダー</li>
+            <li onclick="openApp('app8')"><img src="weather.png" alt="天気"> 天気</li>
+            <li onclick="openApp('app9')"><img src="maps.png" alt="マップ"> マップ</li>
+            <li onclick="openApp('app10')"><img src="mail.png" alt="メール"> メール</li>
+            <li onclick="openApp('app11')"><img src="music.png" alt="音楽プレイヤー"> 音楽プレイヤー</li>
+            <li onclick="openApp('app12')"><img src="video.png" alt="ビデオプレイヤー"> ビデオプレイヤー</li>
+            <li onclick="openApp('app13')"><img src="settings.png" alt="設定"> 設定</li>
+        </ul>
+        <div id="shutdown-button">
+            <button onclick="shutdown()">シャットダウン</button>
+        </div>
+    </div>
+    <div class="window" id="word">
+        <div class="window-header">
+            Word
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('word')">_</span>
+                <span onclick="maximizeWindow('word')">[ ]</span>
+                <span onclick="closeWindow('word')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <div>Wordアプリのコンテンツ</div>
+        </div>
+    </div>
+    <div class="window" id="excel">
+        <div class="window-header">
+            Excel
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('excel')">_</span>
+                <span onclick="maximizeWindow('excel')">[ ]</span>
+                <span onclick="closeWindow('excel')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <table>
+                <tr><td>Excel</td><td>の</td></tr>
+                <tr><td>コンテンツ</td><td>ここに</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="window" id="powerpoint">
+        <div class="window-header">
+            PowerPoint
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('powerpoint')">_</span>
+                <span onclick="maximizeWindow('powerpoint')">[ ]</span>
+                <span onclick="closeWindow('powerpoint')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <div>PowerPointアプリのコンテンツ</div>
+        </div>
+    </div>
+    <div class="window" id="app4">
+        <div class="window-header">
+            ブラウザ
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app4')">_</span>
+                <span onclick="maximizeWindow('app4')">[ ]</span>
+                <span onclick="closeWindow('app4')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://www.bing.com" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div class="window" id="app5">
+        <div class="window-header">
+            メモ帳
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app5')">_</span>
+                <span onclick="maximizeWindow('app5')">[ ]</span>
+                <span onclick="closeWindow('app5')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <textarea style="width: 100%; height: 100%;">メモ帳アプリのコンテンツ</textarea>
+        </div>
+    </div>
+    <div class="window" id="app6">
+        <div class="window-header">
+            電卓
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app6')">_</span>
+                <span onclick="maximizeWindow('app6')">[ ]</span>
+                <span onclick="closeWindow('app6')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://sakalt.github.io/calc" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div class="window" id="app7">
+        <div class="window-header">
+            カレンダー
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app7')">_</span>
+                <span onclick="maximizeWindow('app7')">[ ]</span>
+                <span onclick="closeWindow('app7')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://example.com/calendar" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div class="window" id="app8">
+        <div class="window-header">
+            天気
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app8')">_</span>
+                <span onclick="maximizeWindow('app8')">[ ]</span>
+                <span onclick="closeWindow('app8')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://weather.com" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div class="window" id="app9">
+        <div class="window-header">
+            マップ
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app9')">_</span>
+                <span onclick="maximizeWindow('app9')">[ ]</span>
+                <span onclick="closeWindow('app9')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://maps.google.com" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div class="window" id="app10">
+        <div class="window-header">
+            メール
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app10')">_</span>
+                <span onclick="maximizeWindow('app10')">[ ]</span>
+                <span onclick="closeWindow('app10')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://outlook.com" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div class="window" id="app11">
+        <div class="window-header">
+            音楽プレイヤー
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app11')">_</span>
+                <span onclick="maximizeWindow('app11')">[ ]</span>
+                <span onclick="closeWindow('app11')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://example.com/music" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div class="window" id="app12">
+        <div class="window-header">
+            ビデオプレイヤー
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app12')">_</span>
+                <span onclick="maximizeWindow('app12')">[ ]</span>
+                <span onclick="closeWindow('app12')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://example.com/video" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div class="window" id="app13">
+        <div class="window-header">
+            設定
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('app13')">_</span>
+                <span onclick="maximizeWindow('app13')">[ ]</span>
+                <span onclick="closeWindow('app13')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://example.com/settings" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+    <div id="bluescreen">
+        <p>ブルースクリーンエラーが発生しました。</p>
+    </div>
+</body>
+</html>
