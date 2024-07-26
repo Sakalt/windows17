@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Windows 39</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1E1E1E;
+            color: white;
+            overflow: hidden;
+        }
+        #taskbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s;
+        }
+        #start-button {
+            background-color: #0078D4;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        #start-button:hover {
+            background-color: #005999;
+        }
+        #start-menu {
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            background-color: #444;
+            width: 250px;
+            max-height: 300px;
+            display: none;
+            flex-direction: column;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #start-menu.visible {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .start-menu-button {
+            background-color: #555;
+            border: none;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            text-align: left;
+        }
+        .start-menu-button:hover {
+            background-color: #666;
+        }
+        .window {
+            position: fixed;
+            width: 400px;
+            height: 300px;
+            background-color: #222;
+            border: 1px solid #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: none;
+            flex-direction: column;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+        .window.visible {
+            display: flex;
+            transform: scale(1);
+            opacity: 1;
+        }
+        .window-header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+        }
+        .window-buttons span {
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        .window-body {
+            padding: 10px;
+            flex: 1;
+            overflow: auto;
+        }
+        .window-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="taskbar">
+        <button id="start-button">Start</button>
+    </div>
+    <div id="start-menu">
+        <button class="start-menu-button" onclick="openWindow('notepad')">メモ帳</button>
+        <button class="start-menu-button" onclick="openWindow('calculator')">電卓</button>
+        <button class="start-menu-button" onclick="openWindow('calendar')">カレンダー</button>
+        <button class="start-menu-button" onclick="openWindow('clock')">時計</button>
+        <button class="start-menu-button" onclick="openWindow('tasks')">タスク管理</button>
+        <button class="start-menu-button" onclick="openWindow('browser')">ブラウザ</button>
+        <button class="start-menu-button" onclick="openWindow('mail')">メール</button>
+        <button class="start-menu-button" onclick="openWindow('music')">音楽プレーヤー</button>
+        <button class="start-menu-button" onclick="openWindow('weather')">天気予報</button>
+        <button class="start-menu-button" onclick="openWindow('notes')">メモ取り</button>
+        <button class="start-menu-button" onclick="openWindow('dictionary')">辞書</button>
+    </div>
+
+    <!-- 各アプリのウィンドウ -->
+    <div class="window" id="notepad">
+        <div class="window-header">
+            メモ帳
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('notepad')">_</span>
+                <span onclick="maximizeWindow('notepad')">[ ]</span>
+                <span onclick="closeWindow('notepad')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <textarea placeholder="ここにメモを取ってください..."></textarea>
+        </div>
+    </div>
+    <div class="window" id="calculator">
+        <div class="window-header">
+            電卓
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('calculator')">_</span>
+                <span onclick="maximizeWindow('calculator')">[ ]</span>
+                <span onclick="closeWindow('calculator')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            電卓のコンテンツ
+        </div>
+    </div>
+    <div class="window" id="calendar">
+        <div class="window-header">
+            カレンダー
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('calendar')">_</span>
+                <span onclick="maximizeWindow('calendar')">[ ]</span>
+                <span onclick="closeWindow('calendar')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            カレンダーのコンテンツ
+        </div>
+    </div>
+    <div class="window" id="clock">
+        <div class="window-header">
+            時計
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('clock')">_</span>
+                <span onclick="maximizeWindow('clock')">[ ]</span>
+                <span onclick="closeWindow('clock')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            時計のコンテンツ
+        </div>
+    </div>
+    <div class="window" id="tasks">
+        <div class="window-header">
+            タスク管理
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('tasks')">_</span>
+                <span onclick="maximizeWindow('tasks')">[ ]</span>
+                <span onclick="closeWindow('tasks')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            タスク管理のコンテンツ
+        </div>
+    </div>
+    <div class="window" id="browser">
+        <div class="window-header">
+            ブラウザ
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('browser')">_</span>
+                <span onclick="maximizeWindow('browser')">[ ]</span>
+                <span onclick="closeWindow('browser')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://www.bing.com" title="Bingブラウザ"></iframe>
+        </div>
+    </div>
+    <div class="window" id="mail">
+        <div class="window-header">
+            メール
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('mail')">_</span>
+                <span onclick="maximizeWindow('mail')">[ ]</span>
+                <span onclick="closeWindow('mail')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            メールのコンテンツ
+        </div>
+    </div>
+    <div class="window" id="music">
+        <div class="window-header">
+            音楽プレーヤー
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('music')">_</span>
+                <span onclick="maximizeWindow('music')">[ ]</span>
+                <span onclick="closeWindow('music')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            音楽プレーヤーのコンテンツ
+        </div>
+    </div>
+    <div class="window" id="weather">
+        <div class="window-header">
+            天気予報
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('weather')">_</span>
+                <span onclick="maximizeWindow('weather')">[ ]</span>
+                <span onclick="closeWindow('weather')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            天気予報のコンテンツ
+        </div>
+    </div>
+    <div class="window" id="notes">
+        <div class="window-header">
+            メモ取り
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('notes')">_</span>
+                <span onclick="maximizeWindow('notes')">[ ]</span>
+                <span onclick="closeWindow('notes')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            メモ取りのコンテンツ
+        </div>
+    </div>
+    <div class="window" id="dictionary">
+        <div class="window-header">
+            辞書
+            <div class="window-buttons">
+                <span onclick="minimizeWindow('dictionary')">_</span>
+                <span onclick="maximizeWindow('dictionary')">[ ]</span>
+                <span onclick="closeWindow('dictionary')">X</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <iframe src="https://amuhiku.netlify.app" title="辞書アプリ"></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('start-button').addEventListener('click', function() {
+            var menu = document.getElementById('start-menu');
+            menu.classList.toggle('visible');
+        });
+
+        function openWindow(id) {
+            var win = document.getElementById(id);
+            win.classList.add('visible');
+        }
+
+        function closeWindow(id) {
+            var win = document.getElementById(id);
+            win.classList.remove('visible');
+        }
+
+        function minimizeWindow(id) {
+            var win = document.getElementById(id);
+            win.style.transform = 'scale(0.8)';
+            win.style.opacity = '0.8';
+        }
+
+        function maximizeWindow(id) {
+            var win = document.getElementById(id);
+            win.style.transform = 'scale(1)';
+            win.style.opacity = '1';
+        }
+    </script>
+</body>
+</html>
