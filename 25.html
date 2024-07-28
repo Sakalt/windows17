@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>windows 25</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: url('path/to/background.gif') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            border-top: 2px solid white;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+        .window {
+            position: absolute;
+            width: 600px;
+            height: 400px;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+        }
+        .window-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 5px;
+            cursor: move;
+        }
+        .window-header .buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .window-header .button {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .window-header .close {
+            background-color: red;
+        }
+        .window-header .minimize {
+            background-color: yellow;
+        }
+        .window-header .maximize {
+            background-color: green;
+        }
+        .window-body {
+            flex: 1;
+            padding: 10px;
+            overflow: auto;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+        #note textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: beige;
+            resize: none;
+        }
+        .browser-tabs {
+            display: flex;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ccc;
+        }
+        .browser-tabs button {
+            background-color: #ddd;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .browser-tabs button.active {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="taskbar">
+    <div class="app-icon" onclick="openApp('dictionary')">📚 辞書</div>
+    <div class="app-icon" onclick="openApp('calculator')">🧮 電卓</div>
+    <div class="app-icon" onclick="openApp('note')">📝 メモ</div>
+    <div class="app-icon" onclick="openApp('browser')">🌐 ブラウザ</div>
+    <div class="app-icon" onclick="openApp('clock')">⏰ 時計</div>
+    <div class="app-icon" onclick="openApp('weather')">🌦 天気</div>
+    <div class="app-icon" onclick="openApp('camera')">📷 カメラ</div>
+    <div class="app-icon" onclick="openApp('paint')">🎨 ペイント</div>
+    <div class="app-icon" onclick="openApp('twitter')">🐦 Twitter</div>
+    <div class="app-icon" onclick="openApp('youtube')">🎥 YouTube</div>
+    <div class="app-icon" onclick="openApp('settings')">⚙ 設定</div>
+    <div class="app-icon" onclick="openApp('fileExplorer')">📁 ファイルエクスプローラー</div>
+    <div class="app-icon" onclick="openApp('email')">✉️ メール</div>
+    <div class="app-icon" onclick="openApp('music')">🎵 ミュージック</div>
+    <div class="app-icon" onclick="openApp('gallery')">🖼️ ギャラリー</div>
+    <div class="app-icon" onclick="shutdown()">🔌 シャットダウン</div>
+</div>
+
+<div id="dictionary" class="window">
+    <div class="window-body">
+        <iframe src="https://amuhiku.netlify.app"></iframe>
+    </div>
+</div>
+
+<div id="calculator" class="window">
+    <div class="window-body">
+        <iframe src="path/to/calculator.html"></iframe>
+    </div>
+</div>
+
+<div id="note" class="window">
+    <div class="window-body">
+        <textarea id="note-textarea" oninput="saveNote()"></textarea>
+    </div>
+</div>
+
+<div id="browser" class="window">
+    <div class="window-body">
+        <div class="browser-tabs">
+            <button class="active" onclick="openTab('tab1')">Tab 1</button>
+            <button onclick="openTab('tab2')">Tab 2</button>
+        </div>
+        <iframe id="tab1" src="https://example.com"></iframe>
+        <iframe id="tab2" src="https://anotherexample.com" style="display:none;"></iframe>
+    </div>
+</div>
+
+<div id="clock" class="window">
+    <div class="window-body">
+        <iframe src="path/to/clock.html"></iframe>
+    </div>
+</div>
+
+<div id="weather" class="window">
+    <div class="window-body">
+        <iframe src="path/to/weather.html"></iframe>
+    </div>
+</div>
+
+<div id="camera" class="window">
+    <div class="window-body">
+        <video id="camera-stream" autoplay></video>
+        <button onclick="capturePhoto()">写真を撮る</button>
+        <canvas id="camera-canvas" style="display: none;"></canvas>
+        <img id="camera-photo" src="" alt="写真" style="display: none;">
+    </div>
+</div>
+
+<div id="paint" class="window">
+    <div class="window-body">
+        <iframe src="https://paint.js.org"></iframe>
+    </div>
+</div>
+
+<div id="twitter" class="window">
+    <div class="window-body">
+        <iframe src="https://twitter.com"></iframe>
+    </div>
+</div>
+
+<div id="youtube" class="window">
+    <div class="window-body">
+        <iframe src="https://youtube.com"></iframe>
+    </div>
+</div>
+
+<div id="settings" class="window">
+    <div class="window-body">
+        <iframe src="path/to/settings.html"></iframe>
+    </div>
+</div>
+
+<div id="fileExplorer" class="window">
+    <div class="window-body">
+        <input type="file" id="file-upload" multiple onchange="uploadFiles()">
+        <ul id="file-list"></ul>
+    </div>
+</div>
+
+<div id="email" class="window">
+    <div class="window-body">
+        <form id="email-form" onsubmit="sendEmail(event)">
+            <input type="email" id="email-to" placeholder="宛先" required>
+            <input type="text" id="email-subject" placeholder="件名" required>
+            <textarea id="email-body" placeholder="本文" required></textarea>
+            <button type="submit">送信</button>
+        </form>
+    </div>
+</div>
+
+<div id="music" class="window">
+    <div class="window-body">
+        <iframe src="path/to/music.html"></iframe>
+    </div>
+</div>
+
+<div id="gallery" class="window">
+    <div class="window-body">
+        <iframe src="path/to/gallery.html"></iframe>
+    </div>
+</div>
+
+<script>
+    function openApp(appId) {
+        let app = document.getElementById(appId);
+        app.style.display = 'flex';
+        app.style.zIndex = 10;
+        addHeader(app);
+    }
+
+    function closeApp(appId) {
+        document.getElementById(appId).style.display = 'none';
+    }
+
+    function minimizeApp(appId) {
+        document.getElementById(appId).style.display = 'none';
+    }
+
+    function maximizeApp(appId) {
+        let app = document.getElementById(appId);
+        app.style.width = '100vw';
+        app.style.height = '100vh';
+        app.style.top = '0';
+        app.style.left = '0';
+    }
+
+    function shutdown() {
+        let shutdownScreen = document.createElement('div');
+        shutdownScreen.style.position = 'fixed';
+        shutdownScreen.style.top = 0;
+        shutdownScreen.style.left = 0;
+        shutdownScreen.style.width = '100%';
+        shutdownScreen.style.height = '100%';
+        shutdownScreen.style.backgroundColor = 'black';
+        shutdownScreen.style.zIndex = 9999;
+        document.body.appendChild(shutdownScreen);
+    }
+
+    function openTab(tabId) {
+        document.querySelectorAll('.window-body iframe').forEach(iframe => {
+            iframe.style.display = 'none';
+        });
+        document.getElementById(tabId).style.display = 'block';
+        document.querySelectorAll('.browser-tabs button').forEach(button => {
+            button.classList.remove('active');
+        });
+        document.querySelector(`.browser-tabs button[onclick="openTab('${tabId}')"]`).classList.add('active');
+    }
+
+    function addHeader(app) {
+        if (!app.querySelector('.window-header')) {
+            let header = document.createElement('div');
+            header.className = 'window-header';
+            header.innerHTML = `
+                <span>${app.id}</span>
+                <div class="buttons">
+                    <div class="button close" onclick="closeApp('${app.id}')"></div>
+                    <div class="button minimize" onclick="minimizeApp('${app.id}')"></div>
+                    <div class="button maximize" onclick="maximizeApp('${app.id}')"></div>
+                </div>
+            `;
+            app.insertBefore(header, app.firstChild);
+            header.addEventListener('mousedown', startDrag);
+        }
+    }
+
+    function startDrag(e) {
+        let window = e.target.closest('.window');
+        let shiftX = e.clientX - window.getBoundingClientRect().left;
+        let shiftY = e.clientY - window.getBoundingClientRect().top;
+
+        function moveAt(x, y) {
+            window.style.left = x - shiftX + 'px';
+            window.style.top = y - shiftY + 'px';
+        }
+
+        function onMouseMove(event) {
+            moveAt(event.clientX, event.clientY);
+        }
+
+        document.addEventListener('mousemove', onMouseMove);
+
+        window.onmouseup = function() {
+            document.removeEventListener('mousemove', onMouseMove);
+            window.onmouseup = null;
+        };
+    }
+
+    function saveNote() {
+        localStorage.setItem('note-content', document.getElementById('note-textarea').value);
+    }
+
+    document.getElementById('note-textarea').value = localStorage.getItem('note-content') || '';
+
+    function uploadFiles() {
+        const files = document.getElementById('file-upload').files;
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = '';
+
+        for (let file of files) {
+            const listItem = document.createElement('li');
+            listItem.textContent = file.name;
+            fileList.appendChild(listItem);
+            saveFile(file);
+        }
+    }
+
+    function saveFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const files = JSON.parse(localStorage.getItem('uploaded-files') || '[]');
+            files.push({
+                name: file.name,
+                content: event.target.result
+            });
+            localStorage.setItem('uploaded-files', JSON.stringify(files));
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function sendEmail(event) {
+        event.preventDefault();
+        const to = document.getElementById('email-to').value;
+        const subject = document.getElementById('email-subject').value;
+        const body = document.getElementById('email-body').value;
+        alert(`Email sent to ${to} with subject "${subject}" and body "${body}"`);
+    }
+
+    function capturePhoto() {
+        const video = document.getElementById('camera-stream');
+        const canvas = document.getElementById('camera-canvas');
+        const photo = document.getElementById('camera-photo');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL();
+        photo.src = dataUrl;
+        photo.style.display = 'block';
+        localStorage.setItem('captured-photo', dataUrl);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const video = document.getElementById('camera-stream');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                video.srcObject = stream;
+            });
+        }
+
+        const savedPhoto = localStorage.getItem('captured-photo');
+        if (savedPhoto) {
+            const photo = document.getElementById('camera-photo');
+            photo.src = savedPhoto;
+            photo.style.display = 'block';
+        }
+
+        const savedFiles = JSON.parse(localStorage.getItem('uploaded-files') || '[]');
+        const fileList = document.getElementById('file-list');
+        for (let file of savedFiles) {
+            const listItem = document.createElement('li');
+            listItem.textContent = file.name;
+            fileList.appendChild(listItem);
+        }
+    });
+</script>
+
+</body>
+</html>
