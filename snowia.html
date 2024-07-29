@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Snowia (2116)</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: #e0e0e0;
+            color: #333;
+        }
+        #desktop {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        #taskbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+        #start-menu {
+            position: absolute;
+            bottom: 40px;
+            left: 10px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+        #start-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            margin: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        .app-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .window {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            width: 600px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #333;
+            display: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        .window-header {
+            background: linear-gradient(to bottom, #444, #222);
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-radius: 10px 10px 0 0;
+        }
+        .window-controls button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        .window-controls .minimize {
+            background: linear-gradient(to bottom, #ffeb3b, #ffc107);
+        }
+        .window-controls .maximize {
+            background: linear-gradient(to bottom, #4caf50, #2e7d32);
+        }
+        .window-controls .close {
+            background: linear-gradient(to bottom, #f44336, #d32f2f);
+        }
+        .window-content {
+            padding: 20px;
+            height: calc(100% - 40px);
+            overflow: auto;
+        }
+        #video-player {
+            width: 100%;
+            height: 100%;
+        }
+        textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            background: beige;
+            border: none;
+        }
+        .file-manager-item {
+            margin: 5px 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="desktop">
+        <div id="taskbar">
+            <button id="start-button">スタート</button>
+            <div>11:00 AM</div>
+        </div>
+        <div id="start-menu">
+            <div class="app-icon" data-app="file-explorer">エクスプローラー</div>
+            <div class="app-icon" data-app="web-browser">ウェブブラウザー</div>
+            <div class="app-icon" data-app="notepad">メモ帳</div>
+            <div class="app-icon" data-app="settings">設定</div>
+            <div class="app-icon" data-app="calendar">カレンダー</div>
+            <div class="app-icon" data-app="calculator">電卓</div>
+            <div class="app-icon" data-app="paint">ペイント</div>
+            <div class="app-icon" data-app="music-player">音楽プレイヤー</div>
+            <div class="app-icon" data-app="video-player">ビデオプレイヤー</div>
+            <div class="app-icon" data-app="email">メール</div>
+            <div class="app-icon" data-app="task-manager">タスクマネージャー</div>
+            <div class="app-icon" data-app="weather">天気</div>
+            <div class="app-icon" data-app="news">ニュース</div>
+            <div class="app-icon" data-app="maps">地図</div>
+            <div class="app-icon" data-app="photos">写真</div>
+        </div>
+
+        <!-- ファイルエクスプローラーウィンドウ -->
+        <div id="file-explorer" class="window">
+            <div class="window-header">
+                エクスプローラー
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <input type="file" id="file-upload" multiple />
+                <ul id="file-list"></ul>
+            </div>
+        </div>
+
+        <!-- ウェブブラウザウィンドウ -->
+        <div id="web-browser" class="window">
+            <div class="window-header">
+                ウェブブラウザー
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <iframe src="https://www.bing.com" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+
+        <!-- メモ帳ウィンドウ -->
+        <div id="notepad" class="window">
+            <div class="window-header">
+                メモ帳
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <textarea placeholder="ここにメモを入力..."></textarea>
+            </div>
+        </div>
+
+        <!-- 設定ウィンドウ -->
+        <div id="settings" class="window">
+            <div class="window-header">
+                設定
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <h3>設定</h3>
+                <label for="background-url">背景画像のURL:</label>
+                <input type="text" id="background-url" placeholder="画像のURLを入力">
+                <button id="apply-background-button">背景を適用</button>
+            </div>
+        </div>
+
+        <!-- カレンダーウィンドウ -->
+        <div id="calendar" class="window">
+            <div class="window-header">
+                カレンダー
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>カレンダーコンテンツ</p>
+            </div>
+        </div>
+
+        <!-- 電卓ウィンドウ -->
+        <div id="calculator" class="window">
+            <div class="window-header">
+                電卓
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                 <iframe src="https://sakalt.github.io/calc" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+
+        <!-- ペイントウィンドウ -->
+        <div id="paint" class="window">
+            <div class="window-header">
+                ペイント
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+               <iframe src="https://sakalt.github.io/paint" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+
+        <!-- 音楽プレイヤーウィンドウ -->
+        <div id="music-player" class="window">
+            <div class="window-header">
+                音楽プレイヤー
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>音楽プレイヤーコンテンツ</p>
+            </div>
+        </div>
+
+        <!-- ビデオプレイヤーウィンドウ -->
+        <div id="video-player" class="window">
+            <div class="window-header">
+                ビデオプレイヤー
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <input type="file" id="video-input" accept="video/*" />
+                <video id="video-player-element" controls width="100%" height="100%"></video>
+            </div>
+        </div>
+
+        <!-- メールウィンドウ -->
+        <div id="email" class="window">
+            <div class="window-header">
+                メール
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>メールコンテンツ</p>
+            </div>
+        </div>
+
+        <!-- タスクマネージャーウィンドウ -->
+        <div id="task-manager" class="window">
+            <div class="window-header">
+                タスクマネージャー
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>タスクマネージャーコンテンツ</p>
+            </div>
+        </div>
+
+        <!-- 天気ウィンドウ -->
+        <div id="weather" class="window">
+            <div class="window-header">
+                天気
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>天気コンテンツ</p>
+            </div>
+        </div>
+
+        <!-- ニュースウィンドウ -->
+        <div id="news" class="window">
+            <div class="window-header">
+                ニュース
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>ニュースコンテンツ</p>
+            </div>
+        </div>
+
+        <!-- 地図ウィンドウ -->
+        <div id="maps" class="window">
+            <div class="window-header">
+                地図
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <iframe src="https://www.google.co.jp/maps/@34.7336846,133.9312077,7z?entry=ttu&hl=ja" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+
+        <!-- 写真ウィンドウ -->
+        <div id="photos" class="window">
+            <div class="window-header">
+                写真
+                <div class="window-controls">
+                    <button class="minimize"></button>
+                    <button class="maximize"></button>
+                    <button class="close"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <p>写真コンテンツ</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // スタートメニューの表示切り替え
+        document.getElementById('start-button').addEventListener('click', () => {
+            const startMenu = document.getElementById('start-menu');
+            startMenu.style.display = startMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // アプリケーションの表示切り替え
+        document.querySelectorAll('.app-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                const app = icon.getAttribute('data-app');
+                const windowElement = document.getElementById(app);
+                windowElement.style.display = windowElement.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        // ファイルエクスプローラー機能
+        const files = {};  // ファイルのデータを保存するためのオブジェクト
+
+        document.getElementById('file-upload').addEventListener('change', function(event) {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+            for (const file of event.target.files) {
+                files[file.name] = file;
+                const listItem = document.createElement('li');
+                listItem.textContent = file.name;
+                listItem.className = 'file-manager-item';
+                listItem.addEventListener('click', () => {
+                    // ここでファイルの選択や操作を実行
+                });
+                fileList.appendChild(listItem);
+            }
+        });
+
+        // ビデオプレイヤー機能
+        document.getElementById('video-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const videoPlayer = document.getElementById('video-player-element');
+                videoPlayer.src = URL.createObjectURL(file);
+                videoPlayer.play();
+            }
+        });
+
+        // ウィンドウのドラッグ機能
+        function makeDraggable(el) {
+            let isMouseDown = false;
+            let offset = { x: 0, y: 0 };
+
+            el.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                offset.x = e.clientX - el.getBoundingClientRect().left;
+                offset.y = e.clientY - el.getBoundingClientRect().top;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isMouseDown) {
+                    el.style.left = `${e.clientX - offset.x}px`;
+                    el.style.top = `${e.clientY - offset.y}px`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isMouseDown = false;
+            });
+        }
+
+        document.querySelectorAll('.window-header').forEach(header => {
+            makeDraggable(header.parentElement);
+        });
+
+        // 設定ウィンドウでの背景変更機能
+        document.getElementById('apply-background-button').addEventListener('click', () => {
+            const url = document.getElementById('background-url').value;
+            document.getElementById('desktop').style.backgroundImage = `url('${url}')`;
+        });
+
+        // ウィンドウの最小化・最大化・閉じるボタンの動作
+        document.querySelectorAll('.window-controls .minimize').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const windowElement = e.target.closest('.window');
+                windowElement.style.display = 'none';
+            });
+        });
+
+        document.querySelectorAll('.window-controls .maximize').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const windowElement = e.target.closest('.window');
+                windowElement.style.width = '80%';
+                windowElement.style.height = '80%';
+                windowElement.style.top = '10%';
+                windowElement.style.left = '10%';
+            });
+        });
+
+        document.querySelectorAll('.window-controls .close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const windowElement = e.target.closest('.window');
+                windowElement.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
